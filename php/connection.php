@@ -1,22 +1,29 @@
-
 <?php
-$env = file(__DIR__."/.env");
-foreach($env as $line) {
-  $line = trim($line);
-  if ($line === '' || str_starts_with($line, '#')) {
-    continue;
-  }
-  list ($key, $value) = explode('=', $line, 2);
-  putenv(sprintf('%s=%s', $key, $value));
+$env = __DIR__."/.env";
+
+if (!file_exists($env)) {
+  die("No .env file found");
 }
-$host = getenv('DB_HOST');
-$user = getenv('DB_USER');
-$pass = getenv('DB_PASS');
-$dbname = getenv('DB_NAME');
+
+$envPath = file($env);
+
+foreach ($envPath as $line) {
+  $line = trim($line);
+
+  if ($line === '' || str_starts_with($line, '#')) continue;
+
+  list($key, $value) = explode('=', $line, 2);
+  putenv("$key=$value");
+}
+
+$host  = getenv('DB_HOST') ?: "localhost";
+$dbname = getenv('DB_NAME') ?: "restaurant_reservations";
+$user = getenv('DB_USER') ?: "root";
+$pass = getenv('DB_PASSWORD') ?: "rootpass";
+
 $conn = new mysqli($host, $user, $pass, $dbname);
 
-//check if connected
-if ($conn->connect_error){
-  die ("Connection failed: " . $conn->connect_error);
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
 }
-?>;
+?>
