@@ -141,6 +141,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </div>
     <button type="submit">Login</button>
   </form>
+  <div style="text-align:center; margin-top:18px;">
+    <a href="/website.html" style="color:#888; font-size:14px; text-decoration:none;">← Back to site</a>
+  </div>
+</div>
+  </form>
 </div>
 </body>
 </html>
