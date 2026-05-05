@@ -32,3 +32,4 @@ backups/
 *.swo
 
 scripts
+database-maintenance.md
