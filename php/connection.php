@@ -3,7 +3,7 @@
 $host   = "db";
 $dbname = "unix_project";
 $user   = "root";
-$pass   = trim(file_get_contents('/run/secrets/db_password'));
+$pass   = "rootpass";
 
 $conn = new mysqli($host, $user, $pass, $dbname);
 
