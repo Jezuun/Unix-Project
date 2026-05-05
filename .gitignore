@@ -30,3 +30,5 @@ backups/
 .idea/
 *.swp
 *.swo
+
+scripts
