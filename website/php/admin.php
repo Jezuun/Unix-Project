@@ -1,4 +1,11 @@
 <?php
+session_start();
+
+if (!isset($_SESSION["admin"]) || $_SESSION["admin"] !== true) {
+  header("Location: /php/admin_login.php");
+  exit();
+}
+
 require __DIR__ . '/connection.php';
 /** @var mysqli $conn */
 
@@ -45,16 +52,30 @@ $result = $conn->query("SELECT * FROM reservations ORDER BY created_at DESC");
       font-size: 13px;
     }
 
-    .back {
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
       text-decoration: none;
       color: #555;
       font-size: 14px;
       border: 1px solid #ccc;
       padding: 6px 14px;
       border-radius: 6px;
+      background: #fff;
     }
 
-    .back:hover { background: #eee; }
+    .btn:hover { background: #eee; }
+
+    .btn-logout {
+      color: #9b1c1c;
+      border-color: #f5c6cb;
+      background: #fde8e8;
+    }
+
+    .btn-logout:hover { background: #fcc; }
 
     table {
       width: 100%;
@@ -115,7 +136,10 @@ $result = $conn->query("SELECT * FROM reservations ORDER BY created_at DESC");
       echo "<span class='badge'>$count total</span>";
       ?>
     </div>
-    <a href="/website.html" class="back">← Back to site</a>
+    <div class="actions">
+      <a href="/website.html" class="btn">← Back to site</a>
+      <a href="/php/admin_logout.php" class="btn btn-logout">Logout</a>
+    </div>
   </div>
 
   <table>
