@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>La Maison — Restaurant</title>
+  <title>El Diablo — Restaurant</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <!-- Navbar -->
 <nav class="navbar">
-  <div class="nav-logo">🍽 La Maison</div>
+  <div class="nav-logo">El Diablo Restaurant</div>
   <div class="nav-links">
     <a href="#hero">Home</a>
     <a href="#reserve">Reserve</a>
@@ -22,8 +22,8 @@
 <section class="hero" id="hero">
   <div class="hero-content">
     <p class="hero-sub">Welcome to</p>
-    <h1>La Maison</h1>
-    <p class="hero-desc">Fine dining in the heart of the city. Experience unforgettable flavours in an elegant setting.</p>
+    <h1>El Diablo</h1>
+    <p class="hero-desc">Fine dining accessible to everyone.</p>
     <a href="#reserve" class="hero-btn">Reserve a Table</a>
   </div>
 </section>
@@ -39,14 +39,14 @@
   <div class="info-card">
     <div class="info-icon">📍</div>
     <h3>Location</h3>
-    <p>123 Gourmet Street</p>
+    <p>25 Street Example</p>
     <p>Montreal, QC</p>
   </div>
   <div class="info-card">
     <div class="info-icon">📞</div>
     <h3>Contact</h3>
     <p>+1 (514) 000-0000</p>
-    <p>hello@lamaison.com</p>
+    <p>elangel@eldiablo.com</p>
   </div>
 </section>
 
@@ -57,10 +57,11 @@
     <p class="form-sub">Fill in the details below and we'll confirm your table.</p>
 
     <div id="success-msg">
-      ✔ Reservation made successfully! We'll see you soon.
+      ✔ Reservation made successfully. See you soon.
     </div>
 
     <form method="POST" action="/php/index.php">
+      <input type="hidden" name="csrf_token" value="">
       <div class="form-row">
         <div class="form-group">
           <label for="name">Full Name</label>
@@ -75,7 +76,7 @@
       <div class="form-row">
         <div class="form-group">
           <label for="phone">Phone Number</label>
-          <input type="tel" id="phone" name="phone" placeholder="Your phone number" required>
+          <input type="tel" id="phone" name="phone" placeholder="(123) 456-7890" pattern="\(\d{3}\) \d{3}-\d{4}" maxlength="14" required>
         </div>
         <div class="form-group">
           <label for="guests">Number of Guests</label>
@@ -106,7 +107,7 @@
 
 <!-- Footer -->
 <footer class="footer">
-  <p>© 2026 La Maison Restaurant. All rights reserved.</p>
+  <p>© 2026 El Diablo Restaurant. All rights reserved.</p>
 </footer>
 
 <script>
@@ -117,6 +118,57 @@
     document.getElementById('reserve').scrollIntoView({ behavior: 'smooth' });
     history.replaceState(null, '', '/website.html');
   }
+
+  // Generate CSRF token
+  function generateCSRFToken() {
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  }
+
+  // Set CSRF token when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = document.querySelector('input[name="csrf_token"]');
+    if (csrfToken) {
+      csrfToken.value = generateCSRFToken();
+    }
+  });
+
+  // Phone number formatting
+  const phoneInput = document.getElementById('phone');
+  
+  phoneInput.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    let formattedValue = '';
+    
+    if (value.length > 0) {
+      formattedValue += '(' + value.substring(0, 3);
+    }
+    if (value.length >= 4) {
+      formattedValue += ') ' + value.substring(3, 6);
+    }
+    if (value.length >= 7) {
+      formattedValue += '-' + value.substring(6, 10);
+    }
+    
+    e.target.value = formattedValue;
+  });
+
+  phoneInput.addEventListener('keydown', function(e) {
+    // Allow backspace, delete, tab, escape, enter
+    if ([8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
+        // Allow: Ctrl+A, Command+A
+        (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+        // Allow: home, end, left, right, down, up
+        (e.keyCode >= 35 && e.keyCode <= 40)) {
+      return;
+    }
+    
+    // Ensure that it is a number and stop the keypress
+    if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+      e.preventDefault();
+    }
+  });
 </script>
 
 </body>

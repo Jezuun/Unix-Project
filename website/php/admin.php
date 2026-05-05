@@ -1,7 +1,17 @@
 <?php
-session_start();
+require_once __DIR__ . '/security-config.php';
+require_once __DIR__ . '/csrf-protection.php';
+require_once __DIR__ . '/security-functions.php';
+
+secure_session_start();
 
 if (!isset($_SESSION["admin"]) || $_SESSION["admin"] !== true) {
+  header("Location: /php/admin_login.php");
+  exit();
+}
+
+// Check session timeout
+if (!check_session_timeout()) {
   header("Location: /php/admin_login.php");
   exit();
 }
@@ -21,108 +31,175 @@ $result = $conn->query("SELECT * FROM reservations ORDER BY created_at DESC");
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: sans-serif;
-      background: #f4f4f4;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+      background: #000000;
       padding: 40px 20px;
-      color: #333;
+      color: #1d1d1f;
+      line-height: 1.47059;
+      font-weight: 400;
+      letter-spacing: -.022em;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
+      position: relative;
+      z-index: 1;
     }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
+      padding: 24px 0;
     }
 
     h1 {
-      font-size: 24px;
-      font-weight: 600;
+      font-size: 32px;
+      font-weight: 700;
+      color: #f5f5f7;
+      letter-spacing: -0.022em;
     }
 
     .badge {
-      background: #d4edda;
-      color: #155724;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 13px;
+      background: rgba(52, 199, 89, 0.1);
+      color: #34c759;
+      padding: 6px 16px;
+      border-radius: 980px;
+      font-size: 14px;
+      font-weight: 500;
+      border: 1px solid rgba(52, 199, 89, 0.2);
     }
 
     .actions {
       display: flex;
-      gap: 10px;
+      gap: 12px;
     }
 
     .btn {
       text-decoration: none;
-      color: #555;
+      color: #f5f5f7;
       font-size: 14px;
-      border: 1px solid #ccc;
-      padding: 6px 14px;
-      border-radius: 6px;
-      background: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 20px;
+      border-radius: 980px;
+      background: rgba(255, 255, 255, 0.05);
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      font-weight: 400;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
 
-    .btn:hover { background: #eee; }
+    .btn:hover { 
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: scale(1.02);
+    }
 
     .btn-logout {
-      color: #9b1c1c;
-      border-color: #f5c6cb;
-      background: #fde8e8;
+      color: #ff3b30;
+      border-color: rgba(255, 59, 48, 0.2);
+      background: rgba(255, 59, 48, 0.05);
     }
 
-    .btn-logout:hover { background: #fcc; }
+    .btn-logout:hover { 
+      background: rgba(255, 59, 48, 0.1);
+      border-color: rgba(255, 59, 48, 0.3);
+    }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      background: #fff;
-      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
 
     thead {
-      background: #2c3e50;
-      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     th {
-      padding: 14px 16px;
+      padding: 16px 20px;
       text-align: left;
-      font-size: 13px;
-      font-weight: 500;
+      font-size: 12px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.05em;
+      color: #a1a1a6;
     }
 
     td {
-      padding: 12px 16px;
+      padding: 16px 20px;
       font-size: 14px;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #f5f5f7;
+      font-weight: 400;
     }
 
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #f9f9f9; }
+    tr:hover td { 
+      background: rgba(255, 255, 255, 0.02);
+    }
 
     .no-data {
       text-align: center;
-      padding: 40px;
-      color: #999;
-      font-size: 15px;
+      padding: 60px;
+      color: #86868b;
+      font-size: 16px;
+      font-weight: 400;
     }
 
     .guests-badge {
-      background: #e8f0fe;
-      color: #1a56db;
-      padding: 2px 10px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 500;
+      background: rgba(0, 122, 255, 0.1);
+      color: #007aff;
+      padding: 4px 12px;
+      border-radius: 980px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid rgba(0, 122, 255, 0.2);
+      display: inline-block;
+    }
+    
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+      }
+      
+      .actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+      
+      table {
+        font-size: 12px;
+      }
+      
+      th, td {
+        padding: 12px 8px;
+      }
     }
   </style>
 </head>
@@ -160,15 +237,15 @@ $result = $conn->query("SELECT * FROM reservations ORDER BY created_at DESC");
     <?php if ($result && $result->num_rows > 0): ?>
       <?php while ($row = $result->fetch_assoc()): ?>
         <tr>
-          <td><?= $row['id'] ?></td>
-          <td><?= htmlspecialchars($row['name']) ?></td>
-          <td><?= htmlspecialchars($row['email']) ?></td>
-          <td><?= htmlspecialchars($row['phone']) ?></td>
-          <td><span class="guests-badge"><?= $row['guests'] ?></span></td>
-          <td><?= $row['reservation_date'] ?></td>
-          <td><?= $row['reservation_time'] ?></td>
-          <td><?= htmlspecialchars($row['notes'] ?? '—') ?></td>
-          <td><?= $row['created_at'] ?></td>
+          <td><?= escape($row['id']) ?></td>
+          <td><?= escape($row['name']) ?></td>
+          <td><?= escape($row['email']) ?></td>
+          <td><?= escape($row['phone']) ?></td>
+          <td><span class="guests-badge"><?= escape($row['guests']) ?></span></td>
+          <td><?= escape($row['reservation_date']) ?></td>
+          <td><?= escape($row['reservation_time']) ?></td>
+          <td><?= escape($row['notes'] ?? '—') ?></td>
+          <td><?= escape($row['created_at']) ?></td>
         </tr>
       <?php endwhile; ?>
     <?php else: ?>
