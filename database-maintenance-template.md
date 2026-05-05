@@ -1,7 +1,7 @@
 # Database Maintenance Plan - El Diablo Restaurant
 
 ## Overview
-This document outlines a simple but comprehensive database maintenance plan for the El Diablo Restaurant reservation system running on MariaDB 10.11 in Docker.
+This document outlines a simple but comprehensive database maintenance plan for El Diablo Restaurant reservation system running on MariaDB 10.11 in Docker.
 
 ## Maintenance Schedule
 
@@ -46,7 +46,7 @@ docker exec unix_db mysqldump \
   --triggers \
   --all-databases \
   --user=root \
-  --password=$(cat /path/to/secrets/db_password.txt) \
+  --password=$(cat /path/to/secrets/DB_PASSWORD_FILE) \
   > "$BACKUP_DIR/$BACKUP_FILE"
 
 # Compress backup
@@ -70,8 +70,8 @@ Create `scripts/cleanup-old-data.sh`:
 
 RETENTION_DAYS=90
 
-docker exec unix_db mysql -u root -p$(cat /path/to/secrets/db_password.txt) -e "
-DELETE FROM unix_project.reservations
+docker exec unix_db mysql -u root -p$(cat /path/to/secrets/DB_PASSWORD_FILE) -e "
+DELETE FROM YOUR_DATABASE_NAME.reservations 
 WHERE created_at < DATE_SUB(NOW(), INTERVAL $RETENTION_DAYS DAY);
 "
 
@@ -88,18 +88,18 @@ Create `scripts/optimize-db.sh`:
 # Database optimization script
 # Usage: ./optimize-db.sh
 
-docker exec unix_db mysql -u root -p$(cat /path/to/secrets/db_password.txt) -e "
+docker exec unix_db mysql -u root -p$(cat /path/to/secrets/DB_PASSWORD_FILE) -e "
 -- Analyze tables for statistics
-ANALYZE TABLE unix_project.reservations;
-ANALYZE TABLE unix_project.users;
+ANALYZE TABLE YOUR_DATABASE_NAME.reservations;
+ANALYZE TABLE YOUR_DATABASE_NAME.users;
 
 -- Optimize tables to reduce fragmentation
-OPTIMIZE TABLE unix_project.reservations;
-OPTIMIZE TABLE unix_project.users;
+OPTIMIZE TABLE YOUR_DATABASE_NAME.reservations;
+OPTIMIZE TABLE YOUR_DATABASE_NAME.users;
 
 -- Check table health
-CHECK TABLE unix_project.reservations;
-CHECK TABLE unix_project.users;
+CHECK TABLE YOUR_DATABASE_NAME.reservations;
+CHECK TABLE YOUR_DATABASE_NAME.users;
 "
 
 echo "$(date): Database optimization completed" >> /var/log/db-maintenance.log
@@ -133,12 +133,12 @@ Create `scripts/health-check.sh`:
 # Usage: ./health-check.sh
 
 # Check if database is responding
-if docker exec unix_db mysql -u root -p$(cat /path/to/secrets/db_password.txt) -e "SELECT 1;" > /dev/null 2>&1; then
+if docker exec unix_db mysql -u root -p$(cat /path/to/secrets/DB_PASSWORD_FILE) -e "SELECT 1;" > /dev/null 2>&1; then
     echo "$(date): Database health check - OK" >> /var/log/db-maintenance.log
 else
     echo "$(date): Database health check - FAILED" >> /var/log/db-maintenance.log
     # Send alert (configure your preferred alerting method)
-    # mail -s "Database Health Check Failed" admin@lamaison.com
+    # mail -s "Database Health Check Failed" admin@restaurant.com
 fi
 
 # Check disk space
@@ -157,7 +157,7 @@ Create `scripts/performance-check.sh`:
 # Performance monitoring script
 # Usage: ./performance-check.sh
 
-docker exec unix_db mysql -u root -p$(cat /path/to/secrets/db_password.txt) -e "
+docker exec unix_db mysql -u root -p$(cat /path/to/secrets/DB_PASSWORD_FILE) -e "
 -- Show slow queries
 SELECT * FROM mysql.slow_log ORDER BY start_time DESC LIMIT 10;
 
@@ -187,16 +187,16 @@ if [ -z "$LATEST_BACKUP" ]; then
 fi
 
 # Create test database
-docker exec unix_db mysql -u root -p$(cat /path/to/secrets/db_password.txt) -e "CREATE DATABASE IF NOT EXISTS test_backup;"
+docker exec unix_db mysql -u root -p$(cat /path/to/secrets/DB_PASSWORD_FILE) -e "CREATE DATABASE IF NOT EXISTS test_backup;"
 
 # Restore backup to test database
-gunzip -c "$LATEST_BACKUP" | docker exec -i unix_db mysql -u root -p$(cat /path/to/secrets/db_password.txt) test_backup
+gunzip -c "$LATEST_BACKUP" | docker exec -i unix_db mysql -u root -p$(cat /path/to/secrets/DB_PASSWORD_FILE) test_backup
 
 # Verify data integrity
-RECORD_COUNT=$(docker exec unix_db mysql -u root -p$(cat /path/to/secrets/db_password.txt) -e "SELECT COUNT(*) FROM test_backup.unix_project.reservations;" | tail -1)
+RECORD_COUNT=$(docker exec unix_db mysql -u root -p$(cat /path/to/secrets/DB_PASSWORD_FILE) -e "SELECT COUNT(*) FROM test_backup.YOUR_DATABASE_NAME.reservations;" | tail -1)
 
 # Clean up test database
-docker exec unix_db mysql -u root -p$(cat /path/to/secrets/db_password.txt) -e "DROP DATABASE test_backup;"
+docker exec unix_db mysql -u root -p$(cat /path/to/secrets/DB_PASSWORD_FILE) -e "DROP DATABASE test_backup;"
 
 echo "$(date): Backup verification completed - $RECORD_COUNT records found" >> /var/log/db-maintenance.log
 ```
@@ -212,7 +212,7 @@ docker-compose stop web
 
 # Restore latest backup
 LATEST_BACKUP=$(ls -t /backups/*.sql.gz | head -1)
-gunzip -c "$LATEST_BACKUP" | docker exec -i unix_db mysql -u root -p$(cat /path/to/secrets/db_password.txt)
+gunzip -c "$LATEST_BACKUP" | docker exec -i unix_db mysql -u root -p$(cat /path/to/secrets/DB_PASSWORD_FILE)
 
 # Restart application
 docker-compose start web
@@ -221,11 +221,11 @@ docker-compose start web
 ### 2. Point-in-Time Recovery (if binary logs enabled)
 
 ```bash
-# Find the binary log position from backup time
+# Find binary log position from backup time
 mysqlbinlog --start-datetime="2024-01-01 00:00:00" /var/lib/mysql/mysql-bin.000001 > recovery.sql
 
-# Apply the binary logs
-docker exec -i unix_db mysql -u root -p$(cat /path/to/secrets/db_password.txt) < recovery.sql
+# Apply binary logs
+docker exec -i unix_db mysql -u root -p$(cat /path/to/secrets/DB_PASSWORD_FILE) < recovery.sql
 ```
 
 ## Directory Structure
@@ -299,9 +299,17 @@ long_query_time = 2
 - [ ] Configuration reviewed
 
 ### Log Locations
-- Maintenance logs: `/var/log/db-maintenance.log`
-- Performance logs: `/var/log/db-performance.log`
-- MariaDB logs: `docker logs unix_db`
-- Application logs: `docker logs unix_web`
+- Maintenance logs: `/var/log/db-maintenance.log` 
+- Performance logs: `/var/log/db-performance.log` 
+- MariaDB logs: `docker logs unix_db` 
+- Application logs: `docker logs unix_web` 
 
 This maintenance plan ensures that our restaurant reservation database remains healthy, performant, and secure with minimal manual intervention.
+
+## Environment Variables
+
+Replace these placeholders with your actual values:
+- `YOUR_DATABASE_NAME`: Your database name
+- `YOUR_SECURE_PASSWORD`: Your database password
+- `/path/to/secrets/DB_PASSWORD_FILE`: Path to your password file
+- `/var/log/db-maintenance.log`: Your log file path
