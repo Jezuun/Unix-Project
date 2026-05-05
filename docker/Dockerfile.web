@@ -1,0 +1,40 @@
+FROM nginx:alpine
+
+# Install PHP and required extensions
+RUN apk add --no-cache \
+    php \
+    php-fpm \
+    php-mysqli \
+    php-redis \
+    php-json \
+    php-mbstring \
+    php-curl \
+    php-xml \
+    php-opcache
+
+# Copy nginx configuration
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+
+# Create PHP-FPM directory and configuration
+RUN mkdir -p /etc/php/php-fpm.d && \
+    echo "listen = 0.0.0.0:9000" > /etc/php/php-fpm.d/www.conf && \
+    echo "listen.owner = www-data" >> /etc/php/php-fpm.d/www.conf && \
+    echo "listen.group = www-data" >> /etc/php/php-fpm.d/www.conf && \
+    echo "listen.mode = 0666" >> /etc/php/php-fpm.d/www.conf && \
+    echo "user = www-data" >> /etc/php/php-fpm.d/www.conf && \
+    echo "group = www-data" >> /etc/php/php-fpm.d/www.conf && \
+    echo "pm = dynamic" >> /etc/php/php-fpm.d/www.conf && \
+    echo "pm.max_children = 5" >> /etc/php/php-fpm.d/www.conf && \
+    echo "pm.start_servers = 2" >> /etc/php/php-fpm.d/www.conf && \
+    echo "pm.min_spare_servers = 1" >> /etc/php/php-fpm.d/www.conf && \
+    echo "pm.max_spare_servers = 3" >> /etc/php/php-fpm.d/www.conf && \
+    echo "clear_env = no" >> /etc/php/php-fpm.d/www.conf
+
+# Create directory for PHP files
+RUN mkdir -p /var/www/html
+
+# Expose ports
+EXPOSE 80
+
+# Start nginx and PHP-FPM
+CMD ["sh", "-c", "find /usr -name '*php-fpm*' -executable -type f | head -1 | xargs -I {} {} && nginx -g 'daemon off;'"]
