@@ -5,3 +5,28 @@ node_modules
 dist
 .cache
 .env
+# Environment files
+.env.local
+.env.production
+
+# Sensitive data
+secrets/
+*.log
+
+# Dependencies
+node_modules/
+vendor/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup files
+backups/
+*.backup
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
