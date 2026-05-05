@@ -8,6 +8,7 @@ dist
 # Environment files
 .env.local
 .env.production
+.env.example
 
 # Sensitive data
 secrets/
