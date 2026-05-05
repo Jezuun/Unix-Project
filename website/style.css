@@ -1,0 +1,260 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: #0d0d0d;
+  color: #333;
+}
+
+/* Navbar */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 40px;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+}
+
+.nav-logo {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.nav-links a {
+  color: #ccc;
+  text-decoration: none;
+  margin-left: 28px;
+  font-size: 15px;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: #fff;
+}
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #681111 0%, #000000 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 100px 20px 60px;
+}
+
+.hero-content {
+  max-width: 650px;
+}
+
+.hero-sub {
+  color: #e0a070;
+  font-size: 15px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.hero h1 {
+  color: #fff;
+  font-size: 72px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  line-height: 1.1;
+}
+
+.hero-desc {
+  color: #bbb;
+  font-size: 18px;
+  line-height: 1.7;
+  margin-bottom: 36px;
+}
+
+.hero-btn {
+  display: inline-block;
+  padding: 16px 40px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hero-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+}
+
+/* Info cards */
+.info-section {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding: 60px 40px;
+  background: #111;
+  flex-wrap: wrap;
+}
+
+.info-card {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 32px 40px;
+  text-align: center;
+  min-width: 220px;
+  flex: 1;
+  max-width: 300px;
+}
+
+.info-icon {
+  font-size: 32px;
+  margin-bottom: 14px;
+}
+
+.info-card h3 {
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.info-card p {
+  color: #888;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* Form section */
+.form-section {
+  background: #f4f4f4;
+  padding: 80px 20px;
+}
+
+.container {
+  background: #fff;
+  padding: 50px;
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.form-section h2 {
+  text-align: center;
+  font-size: 32px;
+  color: #222;
+  margin-bottom: 8px;
+}
+
+.form-sub {
+  text-align: center;
+  color: #888;
+  margin-bottom: 32px;
+  font-size: 15px;
+}
+
+#success-msg {
+  display: none;
+  background: #d4edda;
+  color: #155724;
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 15px;
+  text-align: center;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: #555;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+input[type="time"] {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: border-color 0.3s;
+  background: #fafafa;
+}
+
+input:focus {
+  outline: none;
+  border-color: #764ba2;
+  background: #fff;
+}
+
+button {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(118, 75, 162, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Footer */
+.footer {
+  background: #000;
+  color: #555;
+  text-align: center;
+  padding: 24px;
+  font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .hero h1 { font-size: 48px; }
+  .form-row { flex-direction: column; gap: 0; }
+  .container { padding: 30px 20px; }
+  .navbar { padding: 16px 20px; }
+}
