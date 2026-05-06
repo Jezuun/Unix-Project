@@ -23,7 +23,7 @@
   <div class="hero-content">
     <p class="hero-sub">Welcome to</p>
     <h1>El Diablo</h1>
-    <p class="hero-desc">Fine dining accessible to everyone.</p>
+    <p class="hero-desc">Fine dining is accessible to everyone.</p>
     <a href="#reserve" class="hero-btn">Reserve a Table</a>
   </div>
 </section>
@@ -136,11 +136,11 @@
 
   // Phone number formatting
   const phoneInput = document.getElementById('phone');
-  
+
   phoneInput.addEventListener('input', function(e) {
     let value = e.target.value.replace(/\D/g, '');
     let formattedValue = '';
-    
+
     if (value.length > 0) {
       formattedValue += '(' + value.substring(0, 3);
     }
@@ -150,7 +150,7 @@
     if (value.length >= 7) {
       formattedValue += '-' + value.substring(6, 10);
     }
-    
+
     e.target.value = formattedValue;
   });
 
@@ -163,7 +163,7 @@
         (e.keyCode >= 35 && e.keyCode <= 40)) {
       return;
     }
-    
+
     // Ensure that it is a number and stop the keypress
     if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
       e.preventDefault();
