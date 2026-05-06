@@ -246,6 +246,36 @@ body {
   margin-bottom: 20px;
 }
 
+.availability-status {
+  margin: -4px 0 24px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #a1a1a6;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.availability-status.available {
+  color: #34c759;
+  background: rgba(52, 199, 89, 0.1);
+  border-color: rgba(52, 199, 89, 0.2);
+}
+
+.availability-status.limited {
+  color: #ffd60a;
+  background: rgba(255, 214, 10, 0.1);
+  border-color: rgba(255, 214, 10, 0.22);
+}
+
+.availability-status.full,
+.availability-status.warning {
+  color: #ff453a;
+  background: rgba(255, 69, 58, 0.1);
+  border-color: rgba(255, 69, 58, 0.2);
+}
+
 label {
   display: block;
   margin-bottom: 8px;
@@ -303,6 +333,13 @@ button:hover {
 
 button:active {
   transform: scale(0.98);
+}
+
+button:disabled {
+  background: #6e6e73;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 /* Footer */

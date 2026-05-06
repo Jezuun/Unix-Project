@@ -97,6 +97,8 @@
         </div>
       </div>
 
+      <p class="availability-status" id="availability-status">Choose a date and time to check table availability.</p>
+
       <div class="form-group">
         <label for="notes">Special Requests</label>
         <input type="text" id="notes" name="notes" placeholder="Allergies, celebrations, seating preferences...">
@@ -128,6 +130,57 @@
     document.getElementById('reserve').scrollIntoView({ behavior: 'smooth' });
     history.replaceState(null, '', '/website.html');
   }
+
+  const dateInput = document.getElementById('date');
+  const timeInput = document.getElementById('time');
+  const availabilityStatus = document.getElementById('availability-status');
+  const submitButton = document.querySelector('button[type="submit"]');
+
+  function setAvailabilityMessage(message, state) {
+    availabilityStatus.textContent = message;
+    availabilityStatus.className = `availability-status ${state}`;
+  }
+
+  function checkTableAvailability() {
+    const date = dateInput.value;
+    const time = timeInput.value;
+
+    if (!date || !time) {
+      setAvailabilityMessage('Choose a date and time to check table availability.', 'neutral');
+      submitButton.disabled = false;
+      return;
+    }
+
+    setAvailabilityMessage('Checking table availability...', 'neutral');
+
+    fetch(`/php/table-availability.php?date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}`)
+      .then(response => response.json())
+      .then(data => {
+        if (!Number.isInteger(data.available)) {
+          setAvailabilityMessage(data.message || 'Availability is unavailable right now.', 'warning');
+          submitButton.disabled = false;
+          return;
+        }
+
+        if (data.fullyBooked) {
+          setAvailabilityMessage('Fully booked for this time. Please choose another time.', 'full');
+          submitButton.disabled = true;
+        } else if (data.available <= 2) {
+          setAvailabilityMessage(`Only ${data.available} of ${data.total} tables available for this time.`, 'limited');
+          submitButton.disabled = false;
+        } else {
+          setAvailabilityMessage(`${data.available} of ${data.total} tables available for this time.`, 'available');
+          submitButton.disabled = false;
+        }
+      })
+      .catch(() => {
+        setAvailabilityMessage('Availability is unavailable right now.', 'warning');
+        submitButton.disabled = false;
+      });
+  }
+
+  dateInput.addEventListener('change', checkTableAvailability);
+  timeInput.addEventListener('change', checkTableAvailability);
 
   // Generate CSRF token
   function generateCSRFToken() {

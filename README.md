@@ -5,6 +5,7 @@ El Diablo Restaurant is a containerized restaurant reservation web app built wit
 ## Features
 
 - Public reservation page at `http://localhost:8080`
+- Public form checks table availability for the selected date and time
 - Reservation form handled by PHP with server-side validation
 - MariaDB database for users and reservations
 - Admin login page at `http://localhost:8080/php/admin_login.php`
@@ -73,7 +74,7 @@ Default admin credentials:
 
 ## How It Works
 
-The public page is served from `website/website.html`. When a customer submits the reservation form, it posts to `website/php/index.php`, which validates the form and inserts the reservation into MariaDB.
+The public page is served from `website/website.html`. It checks table availability through `website/php/table-availability.php` after a customer selects a date and time. When a customer submits the reservation form, it posts to `website/php/index.php`, which validates the form and inserts the reservation into MariaDB.
 
 The admin dashboard is served from `website/php/admin.php`. After login, it reads reservation records from the database and displays them in a table.
 
@@ -117,7 +118,8 @@ Unix-Project2/
 │   │   ├── index.php
 │   │   ├── rate-limiter.php
 │   │   ├── security-config.php
-│   │   └── security-functions.php
+│   │   ├── security-functions.php
+│   │   └── table-availability.php
 │   ├── style.css
 │   └── website.html
 ├── database-maintenance-template.md
