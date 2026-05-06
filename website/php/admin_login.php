@@ -31,7 +31,7 @@ if ($rateLimiter->tooManyAttempts($key)) {
 } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
     try {
         validate_csrf_token($_POST['csrf_token']);
-        
+
         $username = validate_input(trim($_POST["username"] ?? ""), 'string');
         $password = validate_input(trim($_POST["password"] ?? ""), 'string');
 
@@ -81,7 +81,7 @@ if ($rateLimiter->tooManyAttempts($key)) {
   <title>Admin Login</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
       background: #000000;
@@ -96,7 +96,7 @@ if ($rateLimiter->tooManyAttempts($key)) {
       -webkit-font-smoothing: antialiased;
       position: relative;
     }
-    
+
     body::before {
       content: '';
       position: absolute;
@@ -107,7 +107,7 @@ if ($rateLimiter->tooManyAttempts($key)) {
       background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
       pointer-events: none;
     }
-    
+
     .card {
       background: rgba(255, 255, 255, 0.04);
       padding: 48px 40px;
@@ -121,7 +121,7 @@ if ($rateLimiter->tooManyAttempts($key)) {
       position: relative;
       z-index: 1;
     }
-    
+
     h2 {
       text-align: center;
       margin-bottom: 8px;
@@ -130,7 +130,7 @@ if ($rateLimiter->tooManyAttempts($key)) {
       font-weight: 700;
       letter-spacing: -0.022em;
     }
-    
+
     .sub {
       text-align: center;
       color: #a1a1a6;
@@ -138,7 +138,7 @@ if ($rateLimiter->tooManyAttempts($key)) {
       margin-bottom: 32px;
       font-weight: 400;
     }
-    
+
     .error {
       background: rgba(255, 59, 48, 0.1);
       color: #ff3b30;
@@ -150,9 +150,9 @@ if ($rateLimiter->tooManyAttempts($key)) {
       border: 1px solid rgba(255, 59, 48, 0.2);
       font-weight: 400;
     }
-    
+
     .form-group { margin-bottom: 20px; }
-    
+
     label {
       display: block;
       font-size: 14px;
@@ -161,7 +161,7 @@ if ($rateLimiter->tooManyAttempts($key)) {
       margin-bottom: 8px;
       letter-spacing: -0.022em;
     }
-    
+
     input {
       width: 100%;
       padding: 16px 14px;
@@ -173,18 +173,18 @@ if ($rateLimiter->tooManyAttempts($key)) {
       color: #f5f5f7;
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
     }
-    
+
     input:focus {
       outline: none;
       border-color: #0071e3;
       background: rgba(255, 255, 255, 0.08);
       box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
     }
-    
+
     input::placeholder {
       color: #86868b;
     }
-    
+
     button {
       width: 100%;
       padding: 16px;
@@ -200,29 +200,29 @@ if ($rateLimiter->tooManyAttempts($key)) {
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
       box-shadow: 0 4px 14px 0 rgba(0, 26, 255, 0.2);
     }
-    
-    button:hover { 
+
+    button:hover {
       background: #0077ed;
       transform: scale(1.02);
       box-shadow: 0 6px 20px 0 rgba(0, 26, 255, 0.3);
     }
-    
+
     button:active {
       transform: scale(0.98);
     }
-    
+
     .back-link {
       text-align: center;
       margin-top: 24px;
     }
-    
+
     .back-link a {
       color: #86868b;
       font-size: 14px;
       text-decoration: none;
       transition: color 0.3s;
     }
-    
+
     .back-link a:hover {
       color: #f5f5f7;
     }
@@ -230,7 +230,7 @@ if ($rateLimiter->tooManyAttempts($key)) {
 </head>
 <body>
 <div class="card">
-  <h2>🔒 Admin Login</h2>
+  <h2>Admin Login</h2>
   <p class="sub">Restaurant Reservation System</p>
 
   <?php if (!empty($error)): ?>
