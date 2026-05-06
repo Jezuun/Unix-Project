@@ -13,6 +13,11 @@ class RedisCache {
     
     private function connect() {
         try {
+            if (!class_exists('Redis')) {
+                $this->redis = null;
+                return;
+            }
+
             $this->redis = new Redis();
             $this->redis->connect($this->host, $this->port);
         } catch (Exception $e) {

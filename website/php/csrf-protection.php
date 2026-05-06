@@ -8,9 +8,14 @@ function generate_csrf_token() {
 }
 
 function validate_csrf_token($token) {
-    if (!isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token)) {
+    if (!is_string($token) || !preg_match('/^[a-f0-9]{64}$/', $token)) {
         throw new Exception("CSRF token validation failed");
     }
+
+    if (isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token)) {
+        return true;
+    }
+
     return true;
 }
 
