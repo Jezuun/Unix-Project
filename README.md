@@ -1,275 +1,221 @@
-# El Diablo Restaurant - Containerized Web Application
+# El Diablo Restaurant
 
-A modern, Apple-styled restaurant reservation system built with PHP, Nginx, MariaDB, and Redis, all containerized with Docker.
+El Diablo Restaurant is a containerized restaurant reservation web app built with Nginx, PHP, MariaDB, and Redis. Customers can submit table reservations from the public website, and an admin user can log in to view reservations stored in the database.
 
 ## Features
 
-- **Modern UI**: Apple-inspired design with glass morphism effects and dark theme
-- **Reservation System**: Complete restaurant reservation management
-- **Admin Dashboard**: Secure admin panel for viewing and managing reservations
-- **Responsive Design**: Mobile-first approach with Apple-style interactions
-- **Containerized Architecture**: Fully Dockerized with separate containers for web, database, and cache
-- **Security**: Password hashing, secure session management, and Docker secrets
+- Public reservation page at `http://localhost:8080`
+- Reservation form handled by PHP with server-side validation
+- MariaDB database for users and reservations
+- Admin login page at `http://localhost:8080/php/admin_login.php`
+- Admin dashboard that displays reservation data from the database
+- Redis-backed helper used for caching/rate limiting
+- Docker Compose setup with three containers: web, database, and cache
+- Maintenance scripts for database backup and health checks
 
-## Architecture
+## Technology Stack
 
-### Container Stack
-- **Web Server**: Nginx + PHP 8.2-FPM
-- **Database**: MariaDB 10.11
-- **Cache**: Redis 7 (Alpine)
-
-### Frontend Technologies
-- **Styling**: Apple-inspired CSS with SF Pro font stack
-- **Design System**: Glass morphism, backdrop blur, subtle animations
-- **Responsive**: Mobile-optimized with proper breakpoints
-
-### Backend Technologies
-- **Language**: PHP 8.2
-- **Database**: MySQLi with prepared statements
-- **Caching**: Redis with helper class
-- **Security**: Password hashing, session management
+- **Web server:** Nginx
+- **Back end:** PHP with MySQLi
+- **Database:** MariaDB 10.11
+- **Cache:** Redis 7 Alpine
+- **Frontend:** HTML, CSS, and JavaScript
+- **Infrastructure:** Docker Compose
 
 ## Quick Start
 
 ### Prerequisites
-- Docker and Docker Compose installed
-- Git for cloning the repository
 
-### Setup Steps
+- Docker Desktop or Docker Engine
+- Docker Compose
+- Git
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd Unix-Project2
-   ```
+### 1. Clone the project
 
-2. **Set up environment**:
-   ```bash
-   cp .env.example .env
-   # Edit .env file if needed (defaults work out of the box)
-   ```
+```bash
+git clone <repository-url>
+cd Unix-Project2
+```
 
-3. **Start the application**:
-   ```bash
-   docker-compose up -d
-   ```
+### 2. Create the database password file
 
-4. **Access the application**:
-   - **Main Website**: http://localhost:8080
-   - **Admin Login**: http://localhost:8080/php/admin_login.php
-   - **Database**: localhost:3306
-   - **Redis**: localhost:6379
+Each person running the project should create their own local password file:
 
-### Default Credentials
-- **Admin Login**:
-  - Username: `admin`
-  - Password: `password`
+```bash
+mkdir -p secrets
+cp secrets/db_password.example.txt secrets/db_password.txt
+```
+
+You can keep the example password or replace the contents of `secrets/db_password.txt` with your own password before the first startup.
+
+Important: MariaDB stores its data in a Docker volume. If you change the password after the database has already been created, reset the database volume:
+
+```bash
+docker compose down -v
+docker compose up -d --build
+```
+
+### 3. Start the application
+
+```bash
+docker compose up -d --build
+```
+
+### 4. Open the website
+
+- Main website: `http://localhost:8080`
+- Admin login: `http://localhost:8080/php/admin_login.php`
+
+Default admin credentials:
+
+- Username: `admin`
+- Password: `password`
+
+## How It Works
+
+The public page is served from `website/website.html`. When a customer submits the reservation form, it posts to `website/php/index.php`, which validates the form and inserts the reservation into MariaDB.
+
+The admin dashboard is served from `website/php/admin.php`. After login, it reads reservation records from the database and displays them in a table.
+
+The database is local to the computer running Docker. If two people clone the project on two different computers, each person gets their own MariaDB container and their own local reservation data.
+
+## Docker Containers
+
+The project runs three containers:
+
+- `unix_web`: Nginx and PHP web application
+- `unix_db`: MariaDB database server
+- `unix_redis`: Redis cache server
+
+Ports:
+
+- Website: `localhost:8080`
+- MariaDB: `localhost:3306`
+- Redis: `localhost:6379`
 
 ## Project Structure
 
-```
+```text
 Unix-Project2/
-├── docker/                 # Docker configuration files
-│   ├── Dockerfile         # Web server container
-│   ├── Dockerfile.web     # Web application container
-│   ├── nginx.conf         # Nginx configuration
-│   └── init.sql           # Database initialization script
-├── website/               # Frontend application files
-│   ├── php/              # PHP backend files
-│   │   ├── admin.php     # Admin dashboard
-│   │   ├── admin_login.php # Admin login
-│   │   ├── connection.php # Database connection
-│   │   ├── cache.php     # Redis cache helper
-│   │   └── index.php     # Reservation form handler
-│   ├── website.html      # Main landing page
-│   └── style.css         # Apple-inspired styling
-├── js/                   # JavaScript files
-├── img/                  # Image assets
-├── secrets/              # Docker secrets
-├── docker-compose.yml     # Container orchestration
-└── package.json          # Node.js dependencies (webpack)
+├── docker/
+│   ├── Dockerfile.web
+│   ├── init.sql
+│   └── nginx.conf
+├── scripts/
+│   ├── backup-db.sh
+│   └── health-check.sh
+├── secrets/
+│   ├── db_password.example.txt
+│   └── db_password.txt
+├── website/
+│   ├── php/
+│   │   ├── admin.php
+│   │   ├── admin_login.php
+│   │   ├── cache.php
+│   │   ├── connection.php
+│   │   ├── csrf-protection.php
+│   │   ├── index.php
+│   │   ├── rate-limiter.php
+│   │   ├── security-config.php
+│   │   └── security-functions.php
+│   ├── style.css
+│   └── website.html
+├── database-maintenance-template.md
+├── docker-compose.yml
+└── README.md
 ```
 
-## Container Details
+## Database
 
-### Web Container (`unix_web`)
-- **Port**: 8080 (external) → 80 (internal)
-- **Technology**: Nginx + PHP 8.2-FPM
-- **Features**:
-  - PHP-FPM for optimized PHP processing
-  - MySQLi and Redis extensions
-  - Volume mount for live code updates
-  - Nginx reverse proxy configuration
+The database is named `unix_project`. It is initialized from `docker/init.sql` when the MariaDB container starts for the first time.
 
-### Database Container (`unix_db`)
-- **Port**: 3306 (external) → 3306 (internal)
-- **Technology**: MariaDB 10.11
-- **Features**:
-  - Persistent data storage (`db_data` volume)
-  - Auto-initialization with `init.sql`
-  - Custom database: `unix_project`
-  - Secure password management via Docker secrets
+Tables:
 
-### Cache Container (`unix_redis`)
-- **Port**: 6379 (external) → 6379 (internal)
-- **Technology**: Redis 7 Alpine
-- **Features**:
-  - Persistent data storage (`redis_data` volume)
-  - Used for application caching
-  - Lightweight and optimized
+- `users`: stores admin login information
+- `reservations`: stores reservation form submissions
 
-## Database Schema
+To open a database shell:
 
-### Users Table
-```sql
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### Reservations Table
-```sql
-CREATE TABLE reservations (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    phone VARCHAR(20) NOT NULL,
-    guests INT NOT NULL,
-    reservation_date DATE NOT NULL,
-    reservation_time TIME NOT NULL,
-    notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-## Development
-
-### Live Development
-The application files are mounted as volumes, so changes to your code will be reflected immediately without rebuilding containers.
-
-### Frontend Development
-For frontend development with hot reload:
 ```bash
-npm install
-npm start    # Development server with hot reload
-npm run build    # Production build
-```
-
-### Environment Variables
-The application uses the following environment variables (configured in `.env`):
-- `DB_HOST`: Database hostname (default: `db`)
-- `DB_NAME`: Database name (default: `unix_project`)
-- `DB_USER`: Database username (default: `root`)
-- `DB_PASSWORD`: Database password (from Docker secrets)
-- `REDIS_HOST`: Redis hostname (default: `redis`)
-
-## Security Features
-
-- **Password Hashing**: Uses PHP's `password_hash()` with bcrypt
-- **SQL Injection Prevention**: Prepared statements with MySQLi
-- **Session Management**: Secure PHP sessions for admin authentication
-- **Docker Secrets**: Sensitive data (passwords) managed via Docker secrets
-- **Input Validation**: Server-side validation for all user inputs
-
-## Design System
-
-### Apple-Inspired Styling
-- **Typography**: SF Pro Display font stack
-- **Color Palette**: Apple's dark theme with #0071e3 primary color
-- **Components**: Glass morphism effects with backdrop blur
-- **Animations**: Smooth transitions with cubic-bezier easing
-- **Responsive**: Mobile-first design with proper breakpoints
-
-### CSS Architecture
-- **Modular**: Organized by component sections
-- **Variables**: Consistent color and spacing values
-- **Responsive**: Mobile-first media queries
-- **Performance**: Optimized transitions and animations
-
-## Cache Usage
-
-The application includes a Redis cache helper class in `php/cache.php`:
-
-```php
-// Example usage
-require_once 'cache.php';
-$cache = new Cache();
-
-// Set cache
-$cache->set('key', $data, 3600); // 1 hour TTL
-
-// Get cache
-$data = $cache->get('key');
-
-// Delete cache
-$cache->delete('key');
-```
-
-## Management Commands
-
-### Start the Application
-```bash
-docker-compose up -d
-```
-
-### View Logs
-```bash
-docker-compose logs -f          # All services
-docker-compose logs -f web      # Web service only
-docker-compose logs -f db       # Database only
-docker-compose logs -f redis    # Redis only
-```
-
-### Stop the Application
-```bash
-docker-compose down              # Stop and remove containers
-docker-compose down -v          # Stop, remove, and delete volumes
-```
-
-### Rebuild Containers
-```bash
-docker-compose build --no-cache  # Force rebuild without cache
-docker-compose up -d --build     # Rebuild and start
-```
-
-## Monitoring
-
-### Container Status
-```bash
-docker-compose ps               # Check container status
-docker stats                    # Resource usage
-```
-
-### Database Access
-```bash
-# Connect to database container
 docker exec -it unix_db mysql -u root -p
+```
 
-# Or use external tool
-# Host: localhost
-# Port: 3306
-# Database: unix_project
-# Username: root
-# Password: (check secrets/db_password.txt)
+Use the password from `secrets/db_password.txt`.
+
+## Maintenance Scripts
+
+The `scripts` folder contains project-relative scripts, so they work from any cloned location.
+
+Run a database backup:
+
+```bash
+./scripts/backup-db.sh
+```
+
+Run a database health check:
+
+```bash
+./scripts/health-check.sh
+```
+
+Generated backup and log files are written to `backups/`, which is ignored by Git.
+
+## Common Commands
+
+Start or rebuild the app:
+
+```bash
+docker compose up -d --build
+```
+
+Stop the app:
+
+```bash
+docker compose down
+```
+
+View logs:
+
+```bash
+docker compose logs -f
+```
+
+Restart only the web container:
+
+```bash
+docker compose restart web
+```
+
+Reset the database and all saved reservations:
+
+```bash
+docker compose down -v
+docker compose up -d --build
 ```
 
 ## Troubleshooting
 
-### Common Issues
+If `http://localhost:8080` does not load, make sure Docker is running and the containers are started:
 
-1. **Port conflicts**: Ensure ports 8080, 3306, and 6379 are available
-2. **Permission issues**: Check Docker permissions and volume mounts
-3. **Database connection**: Verify database container is running
-4. **Cache issues**: Check Redis container status
-
-### Reset Application
 ```bash
-# Complete reset (removes all data)
-docker-compose down -v
-docker system prune -f
-docker-compose up -d
+docker compose ps
 ```
+
+If the reservation form shows a database connection error, check that the database container is running and that `secrets/db_password.txt` exists.
+
+If Docker says the password secret file is missing, create it:
+
+```bash
+mkdir -p secrets
+cp secrets/db_password.example.txt secrets/db_password.txt
+```
+
+If port `8080`, `3306`, or `6379` is already in use, stop the other service or change the port mapping in `docker-compose.yml`.
+
+## Security Notes
+
+- The real `secrets/db_password.txt` file should not be committed for a real deployment.
+- The example file `secrets/db_password.example.txt` is safe to commit because it is only a template.
+- Admin passwords are stored hashed in the database.
+- SQL queries use prepared statements for user-submitted data.
+- This project is intended for local class/demo use unless deployed with production-grade secrets, HTTPS, and hosting configuration.
